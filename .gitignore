@@ -1,0 +1,13 @@
+build/
+build-*/
+target/
+core/target/
+CMakeUserPresets.json
+compile_commands.json
+*.user
+*.qmlc
+*.jsc
+.DS_Store
+.cache/
+.vscode/
+.idea/
