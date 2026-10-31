@@ -1,0 +1,28 @@
+{
+	"nodes":[
+		{"id":"c342fdf0d680d99f","type":"text","text":"Booting Up: White loading circle.","x":-780,"y":-420,"width":311,"height":50},
+		{"id":"c834b51887b45730","type":"text","text":"StandBy: Thick Green circle with two gradient of green.","x":-340,"y":-440,"width":250,"height":91},
+		{"id":"b43efa0d11742dd6","type":"text","text":"Listening: Yellow circle, then cut crossed loading circle.","x":80,"y":-437,"width":250,"height":86},
+		{"id":"841e4ec610ea2696","type":"text","text":"Speaking:Purple circle as visualizer.","x":480,"y":-424,"width":250,"height":60},
+		{"id":"2ed5acaa7638af78","type":"file","file":"Projects/Newton/UI/Loading.png","x":-824,"y":-280,"width":400,"height":376},
+		{"id":"bb0fe25516519aa1","type":"file","file":"Projects/Newton/UI/StandBy.png","x":-395,"y":-292,"width":360,"height":400},
+		{"id":"79b243fc0f64243a","type":"file","file":"Projects/Newton/UI/Listening.png","x":-416,"y":480,"width":381,"height":400},
+		{"id":"ab99a2a36ffeab3f","type":"file","file":"Projects/Newton/UI/Listening Dotted.png","x":-6,"y":489,"width":400,"height":391},
+		{"id":"8184b96d1ebedca7","type":"file","file":"Projects/Newton/UI/Loading Processing Dotted Circle.png","x":444,"y":515,"width":400,"height":329},
+		{"id":"9bca9e33fd865f24","type":"file","file":"Projects/Newton/UI/Speaking.png","x":280,"y":-220,"width":400,"height":376},
+		{"id":"7fc26489600a50de","type":"file","file":"Projects/Newton/UI/Speaking Visualise Thick.png","x":730,"y":-232,"width":332,"height":400}
+	],
+	"edges":[
+		{"id":"e5f3bd5d138c43e2","fromNode":"c342fdf0d680d99f","fromSide":"right","toNode":"c834b51887b45730","toSide":"left"},
+		{"id":"c4726cf594a61015","fromNode":"c834b51887b45730","fromSide":"right","toNode":"b43efa0d11742dd6","toSide":"left"},
+		{"id":"d23664d47efe684d","fromNode":"b43efa0d11742dd6","fromSide":"right","toNode":"841e4ec610ea2696","toSide":"left"},
+		{"id":"313139f4b7bc9fa9","fromNode":"c342fdf0d680d99f","fromSide":"bottom","toNode":"2ed5acaa7638af78","toSide":"top"},
+		{"id":"2f83e42c739dbf90","fromNode":"c834b51887b45730","fromSide":"bottom","toNode":"bb0fe25516519aa1","toSide":"top"},
+		{"id":"b2192b1be07d7c94","fromNode":"b43efa0d11742dd6","fromSide":"bottom","toNode":"79b243fc0f64243a","toSide":"top"},
+		{"id":"3d319f9652d16280","fromNode":"b43efa0d11742dd6","fromSide":"bottom","toNode":"ab99a2a36ffeab3f","toSide":"top"},
+		{"id":"7ff2cb6708e9446f","fromNode":"b43efa0d11742dd6","fromSide":"bottom","toNode":"8184b96d1ebedca7","toSide":"top"},
+		{"id":"d435cfadecc35950","fromNode":"841e4ec610ea2696","fromSide":"bottom","toNode":"9bca9e33fd865f24","toSide":"top"},
+		{"id":"2fec9c914d512bdc","fromNode":"841e4ec610ea2696","fromSide":"bottom","toNode":"7fc26489600a50de","toSide":"top"},
+		{"id":"2b47d87ee01cd583","fromNode":"841e4ec610ea2696","fromSide":"top","toNode":"c834b51887b45730","toSide":"top"}
+	]
+}

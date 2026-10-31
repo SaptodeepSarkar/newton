@@ -1,0 +1,21 @@
+{
+	"nodes":[
+		{"id":"2fe0efd4a6f13d84","type":"text","text":"Boot UI\n[[UI Flow.canvas]]","x":-500,"y":-280,"width":163,"height":60},
+		{"id":"fb85e068622c8b79","type":"text","text":"Load ollama model lfm3-audio","x":-160,"y":-340,"width":180,"height":60},
+		{"id":"f1c36ed34e60f6fc","type":"text","text":"Start the [[Newton Harness]]","x":-160,"y":-230,"width":180,"height":71},
+		{"id":"98d5a67bbc74413d","x":140,"y":-280,"width":250,"height":60,"type":"text","text":"Link to Helpers and Keep them offloaded."},
+		{"id":"f4a72115e8a10862","x":140,"y":-179,"width":250,"height":60,"type":"text","text":"Check Health of All API's and Helpers."},
+		{"id":"8fe0a47dff6dd591","x":122,"y":-451,"width":250,"height":60,"type":"text","text":"Outputs Text and Speech at the same time."},
+		{"id":"ae82f289353bf414","x":478,"y":-600,"width":250,"height":125,"type":"text","text":"Take the speech process it using bigger model to see if the user wants any information. "},
+		{"id":"6b4a37dffae3b2a7","x":728,"y":-421,"width":250,"height":81,"type":"text","text":"Inject it back to the context of Lfm3 to generate a streaming audio response."}
+	],
+	"edges":[
+		{"id":"a106ac43fa2800a1","fromNode":"2fe0efd4a6f13d84","fromSide":"right","toNode":"fb85e068622c8b79","toSide":"left"},
+		{"id":"e637a4e613eb03e9","fromNode":"2fe0efd4a6f13d84","fromSide":"right","toNode":"f1c36ed34e60f6fc","toSide":"left"},
+		{"id":"4d0f6766f844b33c","fromNode":"f1c36ed34e60f6fc","fromSide":"right","toNode":"98d5a67bbc74413d","toSide":"left"},
+		{"id":"24becbd5c6b5d7e7","fromNode":"f1c36ed34e60f6fc","fromSide":"right","toNode":"f4a72115e8a10862","toSide":"left"},
+		{"id":"3656721f5f15fe4c","fromNode":"fb85e068622c8b79","fromSide":"right","toNode":"8fe0a47dff6dd591","toSide":"left"},
+		{"id":"c1d1e72a3b9db05f","fromNode":"8fe0a47dff6dd591","fromSide":"right","toNode":"ae82f289353bf414","toSide":"left"},
+		{"id":"4a2f0f069631ad0a","fromNode":"ae82f289353bf414","fromSide":"bottom","toNode":"6b4a37dffae3b2a7","toSide":"left"}
+	]
+}

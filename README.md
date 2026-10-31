@@ -13,9 +13,11 @@ yet. See the roadmap in the project PRD for the order things arrive in.
 ```
 src/            Qt6 app: the orb, its state machine, the QML module
   orbstate.*    five states + one "working" flag, no Qt Quick, testable headless
-  qml/          Theme.qml (every number), Ring.qml (the orb), Main.qml (window)
+  Ring.qml      the orb; Theme.qml holds every number; Main.qml is the window
 tests/          Qt Test + a headless QML smoke test
 core/           Rust crate: the tool-call boundary (not linked in yet)
+docs/           PRD, brief, security audit, UI spec, canvases — mirror of the
+                Obsidian vault. Read AGENTS.md before editing anything here.
 ```
 
 ## Build
