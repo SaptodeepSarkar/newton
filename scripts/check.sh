@@ -11,9 +11,11 @@ cmake --build "$build" --parallel
 # Includes qml_smoke, which loads the UI and walks all five states headless.
 ctest --test-dir "$build" --output-on-failure
 
-cd "$root/core"
-cargo fmt --all -- --check
-cargo clippy --all-targets -- -D warnings
-cargo test
+for crate in core tools/models; do
+    cd "$root/$crate"
+    cargo fmt --all -- --check
+    cargo clippy --all-targets -- -D warnings
+    cargo test
+done
 
 echo "all green"

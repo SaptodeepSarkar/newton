@@ -1,0 +1,11 @@
+{
+  "version": "v1.0.0",
+  "files": [
+    {
+      "name": "lfm3-audio.gguf",
+      "url": "https://github.com/OWNER/REPO/releases/download/v1.0.0/lfm3-audio.gguf",
+      "sha256": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+      "bytes": 1234
+    }
+  ]
+}

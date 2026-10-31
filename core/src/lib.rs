@@ -9,6 +9,9 @@
 
 use std::fmt;
 
+pub mod vad;
+pub mod wake;
+
 /// Widest date range a read tool may ask for, in days.
 pub const MAX_DAYS: u8 = 31;
 /// Longest free-text argument accepted, in characters.
