@@ -22,7 +22,7 @@ docs/           PRD, brief, security audit, UI spec, canvases — mirror of the
 
 ## Build
 
-Needs Qt 6.5 or newer (developed against 6.12, CI pins 6.8), CMake 3.24+, a
+Needs Qt 6.9 or newer (developed against 6.12, CI pins 6.9.3), CMake 3.24+, a
 C++20 compiler, and Ninja.
 
 ```sh
@@ -58,8 +58,9 @@ GitHub Actions, three platforms, on every push and pull request:
 | `qt` | build + ctest | build + ctest | build + ctest |
 | `rust` | fmt, clippy, test | fmt, clippy, test | fmt, clippy, test |
 
-Qt comes from `install-qt-action` pinned to 6.8.0, so CI proves the oldest Qt
-this is meant to support, not the newest machine in the room.
+Qt comes from `install-qt-action` pinned to 6.9.3 — the first line where the
+macOS AGL link is fixed, so CI proves the floor rather than the newest machine
+in the room.
 
 ## The ring
 

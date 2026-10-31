@@ -5,9 +5,10 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-# CI pins 6.8; anything older than 6.5 lacks loadFromModule and PathAngleArc polish.
-find_package(Qt6 6.5 REQUIRED COMPONENTS Core Gui Qml Quick Test)
-qt_standard_project_setup(REQUIRES 6.5)
+# 6.9 is the floor, not a preference: earlier Qt links the AGL framework that
+# Xcode 26 removed, so macOS builds fail at link time (QTBUG-137687).
+find_package(Qt6 6.9 REQUIRED COMPONENTS Core Gui Qml Quick Test)
+qt_standard_project_setup(REQUIRES 6.9)
 
 if(MSVC)
     add_compile_options(/W4 /permissive-)
