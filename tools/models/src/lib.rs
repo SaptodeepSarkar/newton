@@ -18,6 +18,43 @@ pub trait Source {
     fn fetch(&self, url: &str, into: &mut dyn Write) -> Result<(), FetchError>;
 }
 
+/// The downloader until a release pipeline publishes the files. It names the
+/// missing piece instead of pretending a network call might work.
+pub struct DefaultSource;
+
+impl Source for DefaultSource {
+    fn fetch(&self, url: &str, _into: &mut dyn Write) -> Result<(), FetchError> {
+        Err(FetchError::new(format!(
+            "release pipeline not wired yet: nothing publishes {url}; pass --source <dir> to install from a local copy"
+        )))
+    }
+}
+
+/// Reads model files from a local directory, matched by the URL's file name.
+/// This is the offline USB install and what the tests use.
+pub struct DirSource {
+    dir: PathBuf,
+}
+
+impl DirSource {
+    pub fn new(dir: impl Into<PathBuf>) -> Self {
+        Self { dir: dir.into() }
+    }
+}
+
+impl Source for DirSource {
+    fn fetch(&self, url: &str, into: &mut dyn Write) -> Result<(), FetchError> {
+        let name = Path::new(url)
+            .file_name()
+            .ok_or_else(|| FetchError::new(format!("cannot tell a file name from {url}")))?;
+        let path = self.dir.join(name);
+        let mut file = fs::File::open(&path)
+            .map_err(|e| FetchError::new(format!("cannot read {}: {e}", path.display())))?;
+        io::copy(&mut file, into).map_err(|e| FetchError::new(e.to_string()))?;
+        Ok(())
+    }
+}
+
 /// A fetch that did not complete. The message is for the log, not the user.
 #[derive(Debug)]
 pub struct FetchError(String);

@@ -41,3 +41,31 @@ and downloader arrive in a later phase; until then the app starts but cannot
 listen or answer. Models are deliberately kept out of git and out of CI
 artifacts because they are large and separately licensed. When the downloader
 lands, it will fetch them after installation, with a SHA-256 check per file.
+
+## Signing
+
+An unsigned build does not fail, it asks the user to override their own
+operating system. On Windows the exe or installer triggers SmartScreen:
+"Windows protected your PC", hidden behind "More info" and "Run anyway". On
+macOS Gatekeeper refuses the first open with "cannot be opened because the
+developer cannot be verified"; the user must right-click, Open, and confirm.
+Both dialogs look like the artifact is damaged or malicious, and neither can be
+suppressed after the fact. Sign before publishing:
+
+| Platform | What is needed | Signing key |
+|---|---|---|
+| Linux | No signature is required for the `.deb`/`.tgz`; publish a SHA-256 next to it | Optional: an OpenPGP key for the repository `Release` file |
+| macOS | `codesign` with a Developer ID Application certificate, plus a notarisation ticket | Apple Developer ID certificate (`.p12`) and App Store Connect API key or `notarytool` credentials |
+| Windows | Authenticode signature from a code-signing certificate, timestamped | Code-signing certificate (`.pfx`/`.p12`) and its password |
+
+Store each key as a CI secret and keep it out of logs and artifacts:
+
+- Never `echo` a key, pass it on the command line where it lands in the process
+  list, or leave it in a workspace that CI uploads.
+- Never commit a `.p12`, `.pfx`, `.pem` or `*.key`; `.gitignore` them.
+- Pipe secrets through stdin or a file mode `600` that is deleted after use, and
+  check the build log for leaked material before sharing it.
+
+`sign-check.sh <package> <linux|macos|windows>` verifies a built package and
+exits 0 only when it is publishable. It never signs, and it reports a signature
+as unverified rather than valid when `codesign`/`osslsigncode` is not installed.

@@ -9,6 +9,10 @@
 
 use std::fmt;
 
+pub mod context;
+pub mod gguf;
+pub mod grammar;
+pub mod stream;
 pub mod vad;
 pub mod wake;
 
