@@ -10,9 +10,13 @@
 use std::fmt;
 
 pub mod context;
+pub mod execute;
+pub mod fault;
 pub mod gguf;
 pub mod grammar;
+pub mod helper;
 pub mod stream;
+pub mod turn;
 pub mod vad;
 pub mod wake;
 

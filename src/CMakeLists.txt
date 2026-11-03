@@ -1,6 +1,13 @@
 qt_add_library(newton_core STATIC
     audio/AudioCapture.cpp
     audio/AudioCapture.h
+    audio/Mic.cpp
+    audio/Mic.h
+    audio/Speaker.cpp
+    audio/Speaker.h
+    controller.cpp
+    controller.h
+    daemon.cpp
     orbstate.cpp
     orbstate.h
 )
@@ -19,16 +26,24 @@ endif()
 # not callable from bindings.
 set_source_files_properties(Theme.qml PROPERTIES QT_QML_SINGLETON_TYPE TRUE)
 
-qt_add_executable(newton main.cpp)
-qt_add_qml_module(newton
+# The QML lives in its own static library so the tests can load the same
+# module resources the app ships, not a copy.
+qt_add_library(newton_qml STATIC)
+qt_add_qml_module(newton_qml
     URI Newton
     VERSION 1.0
     QML_FILES
         Main.qml
         Ring.qml
         Theme.qml
+        FirstRun.qml
+        Settings.qml
+        MicBadge.qml
 )
-target_link_libraries(newton PRIVATE newton_core Qt6::Quick Qt6::Qml)
+target_link_libraries(newton_qml PUBLIC Qt6::Quick Qt6::Qml)
+
+qt_add_executable(newton main.cpp)
+target_link_libraries(newton PRIVATE newton_core newton_qml newton_qmlplugin)
 
 set_target_properties(newton PROPERTIES
     WIN32_EXECUTABLE TRUE

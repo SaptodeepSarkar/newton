@@ -239,6 +239,95 @@ private slots:
 
         QVERIFY2(!orb.busy(), "a failed turn must not stay in the working phase");
     }
+
+    // A mute that keeps the ring listening would show a live microphone that is
+    // not there. Both listening and its busy phase must fall back to rest.
+    void muteDropsToListeningToStandBy_data()
+    {
+        QTest::addColumn<bool>("busy");
+        QTest::newRow("listening") << false;
+        QTest::newRow("busy") << true;
+    }
+
+    void muteDropsToListeningToStandBy()
+    {
+        QFETCH(bool, busy);
+        OrbState orb;
+        reach(orb, State::Listening);
+        orb.setBusy(busy);
+
+        orb.setMuted(true);
+
+        QVERIFY(orb.muted());
+        QCOMPARE(orb.stateName(), QStringLiteral("standby"));
+        QVERIFY(!orb.busy());
+    }
+
+    void muteLeavesQuietStatesAlone_data()
+    {
+        QTest::addColumn<int>("from");
+        QTest::newRow("booting") << int(State::Booting);
+        QTest::newRow("speaking") << int(State::Speaking);
+        QTest::newRow("error") << int(State::Error);
+    }
+
+    void muteLeavesQuietStatesAlone()
+    {
+        QFETCH(int, from);
+        OrbState orb;
+        reach(orb, State(from));
+
+        orb.setMuted(true);
+
+        QCOMPARE(orb.stateName(), OrbState::name(State(from)));
+    }
+
+    void unmuteWaitsForTheWakeWord()
+    {
+        OrbState orb;
+        reach(orb, State::Listening);
+        orb.setMuted(true);
+        orb.setMuted(false);
+
+        QVERIFY(!orb.muted());
+        QCOMPARE(orb.stateName(), QStringLiteral("standby"));
+    }
+
+    // Nothing moves when muting at rest, but the badge still has to appear.
+    void muteEmitsStateSignalWithoutAMove()
+    {
+        OrbState orb;
+        reach(orb, State::StandBy);
+        QSignalSpy spy(&orb, &OrbState::stateChanged);
+
+        orb.setMuted(true);
+
+        QCOMPARE(orb.stateName(), QStringLiteral("standby"));
+        QCOMPARE(spy.count(), 1);
+    }
+
+    void mutedSignalFiresOncePerChange()
+    {
+        OrbState orb;
+        QSignalSpy spy(&orb, &OrbState::mutedChanged);
+
+        orb.setMuted(true);
+        orb.setMuted(true);
+        orb.setMuted(false);
+        orb.setMuted(false);
+
+        QCOMPARE(spy.count(), 2);
+    }
+
+    void muteKeepsTheErrorReason()
+    {
+        OrbState orb;
+        reach(orb, State::Error);
+
+        orb.setMuted(true);
+
+        QCOMPARE(orb.error(), QStringLiteral("setup"));
+    }
 };
 
 QTEST_GUILESS_MAIN(TestOrbState)

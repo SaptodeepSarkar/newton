@@ -7,16 +7,36 @@
 #include <QImage>
 #include <QQmlApplicationEngine>
 #include <QQmlError>
+#include <QPainterPath>
 #include <QQuickWindow>
+#include <QRegion>
 #include <QTimer>
 #include <QVariant>
 
 #include <QDebug>
 
+#include <cstring>
+
+#include "controller.h"
 #include "orbstate.h"
+
+// Daemon mode: same brain, no window. The shell draws the orb.
+int runDaemon(int argc, char **argv);
 
 int main(int argc, char *argv[])
 {
+    // Qt's Wayland backend resizes a small frameless overlay (GNOME enforces a
+    // minimum) and only approximates input masks. XWayland keeps the puck the
+    // size the design asks for, so use it when it is there.
+    if (qEnvironmentVariableIsEmpty("QT_QPA_PLATFORM") && !qEnvironmentVariableIsEmpty("DISPLAY")
+        && !qEnvironmentVariableIsEmpty("WAYLAND_DISPLAY")) {
+        qputenv("QT_QPA_PLATFORM", "xcb");
+    }
+
+    for (int i = 1; i < argc; ++i)
+        if (std::strcmp(argv[i], "--daemon") == 0)
+            return runDaemon(argc, argv);
+
     QGuiApplication app(argc, argv);
     QCoreApplication::setOrganizationName(QStringLiteral("Newton"));
     QCoreApplication::setApplicationName(QStringLiteral("Newton"));
@@ -32,9 +52,18 @@ int main(int argc, char *argv[])
                                    QStringLiteral("Write one PNG per state into <dir> and exit."),
                                    QStringLiteral("dir"));
     parser.addOption(shotsOption);
+    QCommandLineOption talkOption(QStringLiteral("talk"),
+                                  QStringLiteral("Start one listening turn after a second and "
+                                                 "print every state change to stderr."));
+    parser.addOption(talkOption);
+    QCommandLineOption sayOption(QStringLiteral("say"),
+                                 QStringLiteral("Speak <text> once and exit (voice path check)."),
+                                 QStringLiteral("text"));
+    parser.addOption(sayOption);
     parser.process(app);
     const bool check = parser.isSet(checkOption);
     const QString shotsDir = parser.value(shotsOption);
+    const bool talk = parser.isSet(talkOption);
 
     // Any QML error is a failure. Without this the app boots to a blank window
     // and nothing in CI notices.
@@ -52,12 +81,43 @@ int main(int argc, char *argv[])
                      });
 
     OrbState orb;
-    engine.setInitialProperties({{QStringLiteral("orb"), QVariant::fromValue<QObject *>(&orb)}});
+    const bool automated = check || !shotsDir.isEmpty();
+    Controller device(&orb, !automated);
+    engine.setInitialProperties({{QStringLiteral("orb"), QVariant::fromValue<QObject *>(&orb)},
+                                 {QStringLiteral("device"), QVariant::fromValue<QObject *>(&device)}});
+    if (talk) {
+        QObject::connect(&orb, &OrbState::stateChanged, [&orb] {
+            fprintf(stderr, "state: %s busy=%d\n", qPrintable(orb.stateName()), int(orb.busy()));
+        });
+    }
+
     engine.loadFromModule("Newton", "Main");
 
     if (engine.rootObjects().isEmpty()) {
         qCritical("Newton: root object failed to load");
         return 1;
+    }
+
+    if (QWindow *w = qobject_cast<QWindow *>(engine.rootObjects().at(0))) {
+        // Round window: the corners are not the app, so they take no click and
+        // never paint. Wayland applies this as an input region.
+        QPainterPath disc;
+        disc.addEllipse(QRectF(0, 0, w->width(), w->height()));
+        w->setMask(QRegion(disc.toFillPolygon().toPolygon()));
+        if (const QScreen *screen = w->screen()) {
+            const QRect usable = screen->availableGeometry();
+            w->setPosition(usable.right() - w->width() - 23,
+                           usable.bottom() - w->height() - 23);
+        }
+    }
+
+    if (talk) {
+        QTimer::singleShot(1000, &device, &Controller::talk);
+    }
+    if (parser.isSet(sayOption)) {
+        const QString text = parser.value(sayOption);
+        QTimer::singleShot(300, &device, [&device, text] { device.say(text); });
+        QTimer::singleShot(2500, qApp, &QCoreApplication::quit);
     }
 
     if (!shotsDir.isEmpty()) {

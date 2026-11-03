@@ -72,6 +72,24 @@ void OrbState::setBusy(bool busy)
     emit busyChanged();
 }
 
+void OrbState::setMuted(bool muted)
+{
+    if (muted == m_muted)
+        return;
+    m_muted = muted;
+    emit mutedChanged();
+
+    // A hidden microphone must never look like a listening one: mute drops out
+    // of Listening (whatever the busy flag). Unmute needs a fresh wake word, so
+    // it never lands in Listening. Booting is left alone either way.
+    const bool moved = m_muted ? (m_state == State::Listening || m_busy) && go(State::StandBy)
+                              : m_state != State::Booting && go(State::StandBy);
+
+    // Muting can change nothing but the badge; the UI still needs a redraw.
+    if (!moved)
+        emit stateChanged();
+}
+
 void OrbState::fail(const QString &reason)
 {
     m_error = reason;

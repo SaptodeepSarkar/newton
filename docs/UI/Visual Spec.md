@@ -1,5 +1,31 @@
 # Visual Spec
 
+## The surface: an overlay, not a window
+
+Settled 2026-11-03, from the user's review of the first build.
+
+Newton is **not a desktop app**. It is a puck pinned to the bottom-right corner of the screen, on every workspace, that the compositor never decorates, never moves and never lists. It is drawn as a wlr-layer-shell surface (`Quickshell` `PanelWindow`, `WlrLayer.Overlay`, `ExclusionMode.Ignore`, `WlrKeyboardFocus.None`), which is why it survives a workspace change. A decorated `QWindow` was the first attempt and was wrong: on Wayland the compositor resized it (200 → 896 px) and it disappeared on workspace switch.
+
+- Size: **88 px** disc, 28 px from the right and bottom edges of the usable area.
+- The puck is **matte black** `#0B0A09`: one flat colour, no gradient, no highlight. A single hairline groove at 5 px inset (`#171412`) is the only surface detail.
+- The light on it is a **thin line**, 2.6 px at rest (`≈3 %` of the disc), never a thick donut and never a bloom.
+
+## Weight, revised
+
+The renders were zoomed crops; their stroke ratios described the photographed puck, not the shipped widget. At 88 px those ratios produce a toy. The rule now:
+
+| State | Stroke | Colour | Shape |
+|---|---|---|---|
+| booting | 2.6 px | `#FBFAF8` | one 44° arc, turning |
+| standby | 2.6 px | `#44F7F4` | closed ring, radius 62 px |
+| listening | 2.6 px | `#F1F59C` | closed ring, radius 50 px |
+| listening, working | 2.6 px | `#F5F594` | 7 blocks of 15°, turning |
+| speaking | 2.2 → 4.8 px with level | `#776EEC` → `#9893F5` | closed ring, radius 50 px |
+| error | 2.6 px | `#E5484D` | closed ring |
+
+No glow anywhere. Thickness is the only visualizer.
+
+
 Source of truth for the orb, measured from the seven renders in this folder on 2026-10-31. [[shadcn Catalog Fit]] covers what to borrow from component libraries; this note covers what the thing must look like.
 
 ## What the images are
