@@ -8,10 +8,6 @@
 #include <cstdio>
 #include <utility>
 
-#include <QFileInfo>
-
-#include "audio/Mic.h"
-#include "audio/WakeModel.h"
 #include "controller.h"
 #include "orbstate.h"
 
@@ -26,63 +22,6 @@ QByteArray snapshot(const OrbState &orb, double level)
 }
 
 } // namespace
-
-// Enrolment: the owner says the wake word a few times and it is saved as a
-// template. No training run, no downloaded weights, no speech model.
-int runEnroll(int argc, char **argv, int count)
-{
-    QCoreApplication app(argc, argv);
-    app.setOrganizationName(QStringLiteral("Newton"));
-    app.setApplicationName(QStringLiteral("Newton"));
-
-    Mic mic;
-    WakeModel model;
-    int got = 0;
-
-    auto prompt = [&] { fprintf(stderr, "say the wake word (%d to go)\n", count - got); };
-
-    QObject::connect(&mic, &Mic::speechStarted, [] { fprintf(stderr, "  heard you...\n"); });
-    QObject::connect(&mic, &Mic::speechEnded, [&] {
-        const QVector<qint16> pcm = mic.utterance();
-        if (!model.enroll(pcm)) {
-            fprintf(stderr, "  too short - say it again\n");
-            return;
-        }
-        ++got;
-        fprintf(stderr, "  sample %d: %d samples, matches itself at %.2f\n", got, int(pcm.size()),
-                model.score(pcm));
-        if (got < count) {
-            prompt();
-            return;
-        }
-
-        const QString path = Controller::wakeModelPath();
-        QDir().mkpath(QFileInfo(path).absolutePath());
-        QString error;
-        if (!model.save(path, &error)) {
-            fprintf(stderr, "cannot write %s: %s\n", qPrintable(path), qPrintable(error));
-            app.exit(1);
-            return;
-        }
-        const double threshold = model.calibrate();
-        if (!model.save(path, &error)) {
-            fprintf(stderr, "cannot re-save %s: %s\n", qPrintable(path), qPrintable(error));
-            app.exit(1);
-            return;
-        }
-        fprintf(stderr, "wake model saved: %s (%d templates, threshold %.2f)\n",
-                qPrintable(path), model.templates(), threshold);
-        app.quit();
-    });
-
-    mic.start();
-    if (!mic.isRunning()) {
-        fprintf(stderr, "newton: no microphone for enrolment\n");
-        return 1;
-    }
-    prompt();
-    return app.exec();
-}
 
 // Headless half of the overlay: owns the microphone and the turn, and speaks
 // JSON lines to whatever shell is drawing Newton. No window, no Qt Quick.

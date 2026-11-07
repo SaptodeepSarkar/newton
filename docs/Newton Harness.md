@@ -13,11 +13,9 @@ This on demand fetching makes the ram usage low and stops from polling.
 
 ## Execution
 Newton can execute preset tool calls that can do basic task on the PC.
-# Wake word.
-The turn does not start on any sound. Before a turn is opened, the utterance is compared with the templates recorded from the owner's voice: log energies at 20 mel-spaced bands, compared by dynamic time warping (`src/audio/WakeModel.cpp`). Nothing is transcribed to decide this, and nothing leaves the machine.
+# What starts a turn.
+Any utterance the VAD accepts opens a turn. There is no wake word in front of it: the energy gate in `src/audio/Mic.cpp` decides that speech started, and the orb runs booting → standby → listening → speaking → standby.
 
-- Enrol: `newton --enroll-wake 3`, say the word three times, and the threshold is set from how closely the three takes agree (`~/.local/share/newton/Newton/wake.model`).
-- Not enrolled: any speech opens a turn, so the product is testable straight out of the box.
-- Enrolled: a low score returns the orb to standby without speaking and without counting a turn.
+A per-voice matcher was built and is still tested (`src/audio/WakeModel.cpp`, `tst_wakemodel`), but nothing reads it: it was taken off the live path on 2026-11-07 so the beta can be talked to without a keyword.
 
 Checked 2026-11-07.

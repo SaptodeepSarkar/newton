@@ -73,7 +73,7 @@ Companion docs: [[PRD]] (what), [[Security Audit]] (constraints), [[Visual Spec]
 |---|---|---|
 | 29 | Privacy gate: socket-level allowlist in CI | any non-Google host fails the build |
 | 30 | RAM and latency soak: 8 hours idle, 500 turns | no growth, p95 within budget |
-| 31 | Wake-word tuning on real ambient audio | ≤ 1 false accept per 8 hours. **Enrolled per voice 2026-11-07** (templates + DTW, `src/audio/WakeModel.cpp`); the 8-hour count has not run. |
+| 31 | Wake-word tuning on real ambient audio | ≤ 1 false accept per 8 hours. **Matcher built 2026-11-07** (templates + DTW, `src/audio/WakeModel.cpp`), **unwired the same day** so the beta opens a turn on any VAD-detected speech; the 8-hour count has not run. |
 | 32 | 1.0 checklist: re-run [[Security Audit]], licence texts, release notes | all findings closed or accepted in writing |
 
 ## Gates

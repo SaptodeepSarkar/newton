@@ -27,9 +27,6 @@ public:
     void stop();
     void setMuted(bool muted);
     bool isRunning() const { return m_capture.isRunning(); }
-    // The audio of the utterance that just ended, 16 kHz mono. Empty until one
-    // has been heard.
-    QVector<qint16> utterance() const { return m_utterance; }
 
 signals:
     void availableChanged();
@@ -48,6 +45,4 @@ private:
     bool m_muted = false;
     int m_loudFrames = 0;
     QVector<double> m_history; // ~2 s of frame energy, for the noise floor
-    QVector<qint16> m_utterance;
-    QVector<qint16> m_preroll; // the tail before speech was confirmed
 };
