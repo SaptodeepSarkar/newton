@@ -1,5 +1,6 @@
-#include <QtTest>
+#include <QColor>
 #include <QQmlComponent>
+#include <QtTest>
 #include <QQmlEngine>
 
 // Loads the real Theme singleton and pins every colour and stroke ratio to the
