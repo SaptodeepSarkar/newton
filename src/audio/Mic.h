@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QObject>
+#include <QVector>
 #include <QTimer>
 
 #include "AudioCapture.h"
@@ -43,4 +44,5 @@ private:
     bool m_speech = false;
     bool m_muted = false;
     int m_loudFrames = 0;
+    QVector<double> m_history; // ~2 s of frame energy, for the noise floor
 };

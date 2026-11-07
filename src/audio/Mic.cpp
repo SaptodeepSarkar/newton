@@ -1,16 +1,19 @@
 #include "Mic.h"
 
+#include <algorithm>
 #include <cmath>
 
 #include <QtEndian>
 
 namespace {
-// shortcut: one fixed gate for every microphone; a quiet laptop mic may need
-// it lowered, a noisy room raised. Calibrate per device when a second user
-// reports it, not before.
-constexpr double SpeechRms = 0.020;
-constexpr int FramesToStart = 3;   // ~60 ms of sound before it counts
-constexpr int SilenceMs = 900;     // a normal sentence pause, not a full stop
+// The gate is relative to the room, not to a fixed number: this machine idles
+// at 0.12 RMS, which any absolute threshold would call speech all day.
+constexpr int FloorFrames = 100;    // ~2 s of history
+constexpr int WarmupFrames = 40;    // learn the room before deciding anything
+constexpr double MinLoud = 0.045;   // never trigger on a whisper of noise
+constexpr double FloorRatio = 1.6;  // a voice sits well above the room
+constexpr int FramesToStart = 15;   // ~300 ms of sound before it counts
+constexpr int SilenceMs = 900;      // a normal sentence pause, not a full stop
 } // namespace
 
 Mic::Mic(QObject *parent)
@@ -72,7 +75,17 @@ void Mic::onFrame(const QByteArray &pcm)
     }
     const double rms = std::sqrt(sum / count);
 
-    if (rms < SpeechRms) {
+    m_history.append(rms);
+    if (m_history.size() > FloorFrames)
+        m_history.removeFirst();
+
+    QVector<double> sorted = m_history;
+    std::sort(sorted.begin(), sorted.end());
+    const double floor = sorted.at(sorted.size() / 2);
+    const double gate = qMax(MinLoud, floor * FloorRatio);
+    const bool warm = m_history.size() < WarmupFrames;
+
+    if (warm || rms < gate) {
         // Start once, on the first quiet frame: restarting it on every frame
         // would keep pushing the end back and the turn would never close.
         if (m_speech && !m_silence.isActive())
