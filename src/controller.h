@@ -37,6 +37,8 @@ signals:
     void voiceChanged();
 
 private:
+    // Opens the ears and, coming from Booting, reaches StandBy first.
+    void listen();
     void onSpeechStarted();
     void onSpeechEnded();
     void onSpoke();

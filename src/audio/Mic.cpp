@@ -73,8 +73,10 @@ void Mic::onFrame(const QByteArray &pcm)
     const double rms = std::sqrt(sum / count);
 
     if (rms < SpeechRms) {
-        if (m_speech)
-            m_silence.start(); // restarted by every quiet frame: a pause, not an end
+        // Start once, on the first quiet frame: restarting it on every frame
+        // would keep pushing the end back and the turn would never close.
+        if (m_speech && !m_silence.isActive())
+            m_silence.start();
         else
             m_loudFrames = 0;
         return;
