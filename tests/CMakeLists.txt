@@ -17,7 +17,7 @@ set_tests_properties(qml_smoke PROPERTIES
 )
 
 qt_add_executable(tst_theme tst_theme.cpp)
-target_link_libraries(tst_theme PRIVATE newton_core Qt6::Test Qt6::Qml)
+target_link_libraries(tst_theme PRIVATE newton_core Qt6::Gui Qt6::Test Qt6::Qml)
 add_test(NAME theme COMMAND tst_theme)
 
 qt_add_executable(tst_screens tst_screens.cpp)
