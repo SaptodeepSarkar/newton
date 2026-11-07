@@ -13,7 +13,7 @@ qt_add_library(newton_core STATIC
     orbstate.cpp
     orbstate.h
 )
-target_link_libraries(newton_core PUBLIC Qt6::Core)
+target_link_libraries(newton_core PUBLIC Qt6::Core Qt6::Network)
 target_include_directories(newton_core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 # Microphone capture uses Qt Multimedia when the host has it. Without it the

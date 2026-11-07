@@ -7,7 +7,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 # 6.9 is the floor, not a preference: earlier Qt links the AGL framework that
 # Xcode 26 removed, so macOS builds fail at link time (QTBUG-137687).
-find_package(Qt6 6.9 REQUIRED COMPONENTS Core Gui Qml Quick Test)
+find_package(Qt6 6.9 REQUIRED COMPONENTS Core Gui Network Qml Quick Test)
 qt_standard_project_setup(REQUIRES 6.9)
 
 if(MSVC)
