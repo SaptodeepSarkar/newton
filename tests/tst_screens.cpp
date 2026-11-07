@@ -8,6 +8,10 @@ QStringList warnings;
 
 void collect(QtMsgType type, const QMessageLogContext &, const QString &msg)
 {
+    // Qt's own font-alias notice, not a defect in our QML, and it only shows up
+    // on macOS and Windows.
+    if (msg.contains(QStringLiteral("Populating font family aliases")))
+        return;
     if (type == QtWarningMsg || type == QtCriticalMsg)
         warnings.append(msg);
 }
