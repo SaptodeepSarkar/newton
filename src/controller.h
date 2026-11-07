@@ -3,6 +3,7 @@
 #include <QObject>
 #include <QTimer>
 
+#include "audio/WakeModel.h"
 #include "orbstate.h"
 
 class Mic;
@@ -17,6 +18,7 @@ class Controller : public QObject
     Q_PROPERTY(double level READ level NOTIFY levelChanged)
     Q_PROPERTY(bool available READ available NOTIFY availableChanged)
     Q_PROPERTY(QString voice READ voice NOTIFY voiceChanged)
+    Q_PROPERTY(bool wakeReady READ wakeReady NOTIFY wakeReadyChanged)
 
 public:
     // boot=false keeps the orb in Booting so --shots and --check can walk it.
@@ -25,6 +27,9 @@ public:
     double level() const { return m_level; }
     bool available() const;
     QString voice() const;
+    bool wakeReady() const { return m_wake.isReady(); }
+    // Where the enrolled templates live; shared with the enrolment mode.
+    static QString wakeModelPath();
 
     // Click the puck, or press Space: listen for one sentence.
     Q_INVOKABLE void talk();
@@ -35,6 +40,7 @@ signals:
     void levelChanged();
     void availableChanged();
     void voiceChanged();
+    void wakeReadyChanged();
 
 private:
     // Opens the ears and, coming from Booting, reaches StandBy first.
@@ -47,6 +53,7 @@ private:
     OrbState *m_orb = nullptr;
     Mic *m_mic = nullptr;
     Speaker *m_speaker = nullptr;
+    WakeModel m_wake;
     QTimer m_patience;
     double m_level = 0.0;
 };

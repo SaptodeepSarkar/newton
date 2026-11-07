@@ -17,7 +17,7 @@ Companion docs: [[PRD]] (what), [[Security Audit]] (constraints), [[Visual Spec]
 
 | # | Phase | Test |
 |---|---|---|
-| 5 | llama.cpp + LFM3-audio load from a local GGUF, pinned version | load test on a fixture model; refuses a corrupt file |
+| 5 | llama.cpp + LFM3-audio load from a local GGUF, pinned version | load test on a fixture model; refuses a corrupt file. **Model fetched and checksummed 2026-11-07** (`tools/models/manifest.json`); the llama.cpp link is the open half. |
 | 6 | Streaming audio in / audio out; first-audio latency measured | timing test asserts p50 budget on the reference machine |
 | 7 | Constrained decoding wired to the tool-call crate | grammar rejects invented tool; enforcement test |
 | 8 | Context budget manager: per-turn ceiling, drop vs summarise | property test on 1k synthetic facts |
@@ -73,7 +73,7 @@ Companion docs: [[PRD]] (what), [[Security Audit]] (constraints), [[Visual Spec]
 |---|---|---|
 | 29 | Privacy gate: socket-level allowlist in CI | any non-Google host fails the build |
 | 30 | RAM and latency soak: 8 hours idle, 500 turns | no growth, p95 within budget |
-| 31 | Wake-word tuning on real ambient audio | ≤ 1 false accept per 8 hours |
+| 31 | Wake-word tuning on real ambient audio | ≤ 1 false accept per 8 hours. **Enrolled per voice 2026-11-07** (templates + DTW, `src/audio/WakeModel.cpp`); the 8-hour count has not run. |
 | 32 | 1.0 checklist: re-run [[Security Audit]], licence texts, release notes | all findings closed or accepted in writing |
 
 ## Gates
@@ -86,10 +86,10 @@ Companion docs: [[PRD]] (what), [[Security Audit]] (constraints), [[Visual Spec]
 
 | Phase | Blocked by | Why it cannot be faked |
 |---|---|---|
-| 5, 25 | Model licence | Redistributing LFM3-audio requires a licence that allows it. Until that is read, there is nothing to download. |
+| ~~5, 25~~ | ~~Model licence~~ | **Closed 2026-11-07.** The LFM Open License v1.0 (Section 4) allows redistribution and distribution of derivatives; Section 5 allows commercial use below $10M annual revenue. Shipping a model build means shipping `tools/models/LFM-Open-License-1.0.txt` beside it. |
 | 6, 30 | Hardware | The latency and RAM targets are for a GPU machine. Measuring them on a CPU box produces a number that is not the product. |
 | 13–15 | Google verification | Gmail read is a Restricted scope; without verification the app is capped at 100 users with seven-day tokens. |
 | 25, 26 | Signing keys and a Mac | Windows and macOS installers that users will trust need certificates and notarisation. Neither can be generated here. |
 | Models in git | GitHub limits | Weights are gigabytes; git is not a CDN. Releases (and LFS above 100 MB per file) is the only workable host. |
 
-Checked 2026-10-31.
+Checked 2026-11-07.

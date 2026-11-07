@@ -5,6 +5,8 @@ qt_add_library(newton_core STATIC
     audio/Mic.h
     audio/Speaker.cpp
     audio/Speaker.h
+    audio/WakeModel.cpp
+    audio/WakeModel.h
     controller.cpp
     controller.h
     daemon.cpp

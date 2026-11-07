@@ -1,5 +1,7 @@
 #include "controller.h"
 
+#include <QStandardPaths>
+
 #include "audio/Mic.h"
 #include "audio/Speaker.h"
 
@@ -34,6 +36,13 @@ Controller::Controller(OrbState *orb, bool boot, QObject *parent)
         emit levelChanged();
     });
     connect(m_speaker, &Speaker::finished, this, &Controller::onSpoke);
+
+    QString why;
+    m_wake = WakeModel::load(wakeModelPath(), &why);
+    if (!m_wake.isReady())
+        fprintf(stderr, "wake: no model yet (%s); any speech starts a turn\n", qPrintable(why));
+    else
+        fprintf(stderr, "wake: %d templates, threshold %.2f\n", m_wake.templates(), m_wake.threshold());
 
     if (boot) {
         // White arc while it comes up, then the turquoise rest state.
@@ -91,10 +100,29 @@ void Controller::onSpeechStarted()
     m_orb->setBusy(true); // dotted: it can hear you
 }
 
+QString Controller::wakeModelPath()
+{
+    const QString dir = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    return dir + QStringLiteral("/wake.model");
+}
+
 void Controller::onSpeechEnded()
 {
     if (m_orb->state() != OrbState::State::Listening)
         return;
+
+    // Enrolled: only the wake word opens a turn. Not enrolled: any sentence
+    // does, so the product is testable before anyone records their voice.
+    if (m_wake.isReady()) {
+        const double heard = m_wake.score(m_mic->utterance());
+        fprintf(stderr, "wake: %.2f (threshold %.2f)\n", heard, m_wake.threshold());
+        if (heard < m_wake.threshold()) {
+            m_orb->setBusy(false);
+            m_orb->go(OrbState::State::StandBy);
+            m_mic->start();
+            return;
+        }
+    }
 
     m_orb->setBusy(false);
     m_orb->go(OrbState::State::Speaking);

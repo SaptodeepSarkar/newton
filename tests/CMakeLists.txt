@@ -26,3 +26,7 @@ add_test(NAME screens COMMAND tst_screens)
 # QGuiApplication is required by Text; the platform stays offscreen and no
 # window is ever created.
 set_tests_properties(screens PROPERTIES ENVIRONMENT "QT_QPA_PLATFORM=offscreen")
+
+qt_add_executable(tst_wakemodel tst_wakemodel.cpp)
+target_link_libraries(tst_wakemodel PRIVATE newton_core Qt6::Test)
+add_test(NAME wakemodel COMMAND tst_wakemodel)

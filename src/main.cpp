@@ -22,6 +22,7 @@
 
 // Daemon mode: same brain, no window. The shell draws the orb.
 int runDaemon(int argc, char **argv);
+int runEnroll(int argc, char **argv, int count);
 
 int main(int argc, char *argv[])
 {
@@ -33,9 +34,14 @@ int main(int argc, char *argv[])
         qputenv("QT_QPA_PLATFORM", "xcb");
     }
 
-    for (int i = 1; i < argc; ++i)
+    for (int i = 1; i < argc; ++i) {
         if (std::strcmp(argv[i], "--daemon") == 0)
             return runDaemon(argc, argv);
+        if (std::strcmp(argv[i], "--enroll-wake") == 0) {
+            const bool hasCount = i + 1 < argc && argv[i + 1][0] != '-';
+            return runEnroll(argc, argv, hasCount ? std::atoi(argv[i + 1]) : 3);
+        }
+    }
 
     QGuiApplication app(argc, argv);
     QCoreApplication::setOrganizationName(QStringLiteral("Newton"));

@@ -96,14 +96,28 @@ void Mic::onFrame(const QByteArray &pcm)
     }
 
     m_silence.stop();
-    if (m_speech)
+
+    // Keep the last frames: the word's first consonant arrives before the gate
+    // has heard enough to call it speech.
+    for (int i = 0; i < count; ++i)
+        m_preroll.append(qFromLittleEndian<qint16>(samples + i));
+    while (m_preroll.size() > 4800) // 300 ms
+        m_preroll.removeFirst();
+
+    if (m_speech) {
+        // cap at 5 s so a stuck microphone cannot grow without bound
+        for (int i = 0; i < count && m_utterance.size() < 5 * 16000; ++i)
+            m_utterance.append(qFromLittleEndian<qint16>(samples + i));
         return;
+    }
 
     if (++m_loudFrames < FramesToStart)
         return;
 
     m_loudFrames = 0;
     m_speech = true;
+    m_utterance = m_preroll;
+    m_preroll.clear();
     emit speechChanged();
     emit speechStarted();
 }
